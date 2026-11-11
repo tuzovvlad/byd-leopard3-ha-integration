@@ -284,7 +284,10 @@ async def _handle_webhook(hass: HomeAssistant, webhook_id: str, request: Request
                     if isinstance(v, Vehicle) and v.entry.data.get(CONF_WEBHOOK_ID) == webhook_id), None)
     if vehicle is None:
         return json_response({"error": "unknown_webhook"}, status=404)
-    body = await request.read()
+    if hasattr(request, "read"):
+        body = await request.read()
+    else:
+        body = (await request.text()).encode("utf-8")
 
     secret = vehicle.opt(CONF_SECRET, "")
     if secret and not _authorized(secret, body, request):
