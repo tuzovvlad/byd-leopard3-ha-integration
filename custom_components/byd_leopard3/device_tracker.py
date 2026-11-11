@@ -38,11 +38,15 @@ class Location(VehicleEntity, TrackerEntity):
         return 10
 
     @property
-    def battery_level(self) -> int | None:
-        soc = self.vehicle.values.get("soc")
-        return None if soc is None else int(soc)
-
-    @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        h = self.vehicle.values.get("heading")
-        return {"heading": h} if h is not None else {}
+        attrs = {}
+
+        heading = self.vehicle.values.get("heading")
+        if heading is not None:
+            attrs["heading"] = heading
+
+        soc = self.vehicle.values.get("soc")
+        if soc is not None:
+            attrs["battery_level"] = int(soc)
+
+        return attrs
